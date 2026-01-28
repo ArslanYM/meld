@@ -1,7 +1,10 @@
 import Image from "next/image";
+import ChatInputBox from "./_components/ChatInputBox";
 
 export default function Home() {
   return (
-    <h1>hello</h1>
+    <div>
+      <ChatInputBox />
+    </div>
   );
 }
