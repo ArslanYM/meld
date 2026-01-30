@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { MessageSquare } from "lucide-react";
 const AiMultiModel = () => {
   const [aiModeList, setAiModeList] = useState(AIModelList);
   const onToggleChange = (model, value) => {
@@ -48,10 +49,16 @@ const AiMultiModel = () => {
               )}
             </div>
             <div>
-              <Switch
-                checked={model.enable}
-                onCheckedChange={(v) => onToggleChange(model.model, v)}
-              />
+              {model.enable ? (
+                <Switch
+                  checked={model.enable}
+                  onCheckedChange={(v) => onToggleChange(model.model, v)}
+                />
+              ) : (
+                <MessageSquare
+                  onClick={(v) => onToggleChange(model.model, true)}
+                />
+              )}
             </div>
           </div>
         </div>
