@@ -23,6 +23,7 @@ const AiMultiModel = () => {
     <div className="flex flex-1 h-[75vh] border-b">
       {aiModeList.map((model, index) => (
         <div
+          key={index}
           className={`flex flex-col border-r h-full overflow-auto 
           ${model.enable ? "flex-1 min-w-[400px]" : "flex-none w-[100px]"}
           `}
