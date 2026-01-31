@@ -10,7 +10,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { MessageSquare } from "lucide-react";
+import { Lock, MessageSquare } from "lucide-react";
+import { Button } from "@/components/ui/button";
 const AiMultiModel = () => {
   const [aiModeList, setAiModeList] = useState(AIModelList);
   const onToggleChange = (model, value) => {
@@ -21,7 +22,11 @@ const AiMultiModel = () => {
   return (
     <div className="flex flex-1 h-[75vh] border-b">
       {aiModeList.map((model, index) => (
-        <div className="flex flex-col border-r h-full overflow-auto  min-w-[400px]">
+        <div
+          className={`flex flex-col border-r h-full overflow-auto 
+          ${model.enable ? "flex-1 min-w-[400px]" : "flex-none w-[100px]"}
+          `}
+        >
           <div
             key={index}
             className="flex w-full h-[70px] items-center justify-between border-b p-4"
@@ -61,6 +66,13 @@ const AiMultiModel = () => {
               )}
             </div>
           </div>
+          {model.premium && model.enable && (
+            <div className="h-full flex items-center justify-center">
+              <Button variant="outline">
+                <Lock /> Upgade to unlock
+              </Button>
+            </div>
+          )}
         </div>
       ))}
     </div>
