@@ -8,6 +8,9 @@
     "start": "next start"
   },
   "dependencies": {
+    "@arcjet/bun": "^1.0.0",
+    "@arcjet/inspect": "^1.0.0",
+    "@arcjet/node": "^1.0.0",
     "@clerk/nextjs": "^6.37.1",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-accordion": "^1.2.12",

@@ -2,15 +2,15 @@ export default [
   {
     model: "GPT",
     icon: "/gpt.png",
-    premium: false,
+    premium: true,
     enable: true,
     subModel: [
       { name: "GPT 3.5", premium: false, id: "gpt-3.5" },
-      { name: "GPT 3.5 Turbo", premium: true, id: "gpt-3.5-turbo" },
-      { name: "GPT 4.1 Mini", premium: true, id: "gpt-4.1-mini" },
+      { name: "GPT 3.5 Turbo", premium: false, id: "gpt-3.5-turbo" },
+      { name: "GPT 4.1 Mini", premium: false, id: "gpt-4.1-mini" },
       { name: "GPT 4.1", premium: true, id: "gpt-4.1" },
-      { name: "GPT 5 Nano", premium: true, id: "gpt-5-nano" },
-      { name: "GPT 5 Mini", premium: true, id: "gpt-5-mini" },
+      { name: "GPT 5 Nano", premium: false, id: "gpt-5-nano" },
+      { name: "GPT 5 Mini", premium: false, id: "gpt-5-mini" },
       { name: "GPT 5", premium: true, id: "gpt-5" },
     ],
   },
@@ -28,7 +28,7 @@ export default [
   {
     model: "DeepSeek",
     icon: "/deepseek.png",
-    premium: false,
+    premium: true,
     enable: true,
     subModel: [
       { name: "DeepSeek R1", premium: false, id: "DeepSeek-R1" },
@@ -58,7 +58,7 @@ export default [
   {
     model: "Cohere",
     icon: "/cohere.png",
-    premium: true,
+    premium: false,
     enable: true,
     subModel: [
       { name: "Cohere Command A", premium: false, id: "cohere-command-a" },
