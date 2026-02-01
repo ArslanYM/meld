@@ -1,6 +1,6 @@
 "use client";
-import React, { useState } from "react";
-import AIModelList from "@/shared/AIModelList";
+import React, { useContext, useState } from "react";
+import DefaultModel from "@/shared/AiModelsShared";
 import Image from "next/image";
 import {
   Select,
@@ -10,14 +10,35 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Lock, MessageSquare } from "lucide-react";
+import { Lock, LockIcon, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SelectGroup, SelectLabel } from "@radix-ui/react-select";
+import { AiSelectedModelContext } from "@/context/AiSelectedModelContext";
+import AIModelList from "@/shared/AIModelList";
+import { doc, updateDoc } from "firebase/firestore";
 const AiMultiModel = () => {
   const [aiModeList, setAiModeList] = useState(AIModelList);
+  const { aiSelectedModels, setAiSelectedModels } = useContext(
+    AiSelectedModelContext,
+  );
   const onToggleChange = (model, value) => {
     setAiModeList((prev) =>
       prev.map((m) => (m.model === model ? { ...m, enable: value } : m)),
     );
+  };
+
+  const onSelectedValue = async (parentModel, value) => {
+    setAiSelectedModels((prev) => ({
+      ...prev,
+      [parentModel]: {
+        modelId: value,
+      },
+    }));
+    //update to firebase db
+    const docRef = doc(db, "users", user?.primaryEmailAddress.emailAddress);
+    await updateDoc(docRef, {
+      selectedModelPref: aiSelectedModels,
+    });
   };
   return (
     <div className="flex flex-1 h-[75vh] border-b">
@@ -40,16 +61,49 @@ const AiMultiModel = () => {
                 width={24}
               />
               {model.enable && (
-                <Select>
+                <Select
+                  defaultValue={aiSelectedModels[model.model].modelId}
+                  onValueCange={(value) => {
+                    onSelectedValue(model.model, value);
+                  }}
+                  disabled={model.premium}
+                >
                   <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder={model.subModel[0].name} />
+                    <SelectValue
+                      placeholder={aiSelectedModels[model.model].modelId}
+                    />
                   </SelectTrigger>
                   <SelectContent>
-                    {model.subModel.map((subModel, index) => (
-                      <SelectItem key={index} value={subModel.name}>
-                        {subModel.name}
-                      </SelectItem>
-                    ))}
+                    <SelectGroup className="px-3">
+                      <SelectLabel className="text-sm  text-primary/30">
+                        Free
+                      </SelectLabel>
+                      {model.subModel.map(
+                        (subModel, index) =>
+                          subModel.premium == false && (
+                            <SelectItem key={index} value={subModel.id}>
+                              {subModel.name}
+                            </SelectItem>
+                          ),
+                      )}
+                    </SelectGroup>
+                    <SelectGroup className="px-3 ">
+                      <SelectLabel className="text-sm  text-primary/30">
+                        Premium
+                      </SelectLabel>
+                      {model.subModel.map(
+                        (subModel, index) =>
+                          subModel.premium == true && (
+                            <SelectItem
+                              key={index}
+                              value={subModel.name}
+                              disabled={subModel.premium}
+                            >
+                              {subModel.name} {<LockIcon className="h-4 w-4" />}
+                            </SelectItem>
+                          ),
+                      )}
+                    </SelectGroup>
                   </SelectContent>
                 </Select>
               )}
