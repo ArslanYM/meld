@@ -2,15 +2,15 @@ export default [
   {
     model: "GPT",
     icon: "/gpt.png",
-    premium: true,
+    premium: false,
     enable: true,
     subModel: [
-      { name: "GPT 3.5", premium: false, id: "gpt-3.5" },
-      { name: "GPT 3.5 Turbo", premium: false, id: "gpt-3.5-turbo" },
+      { name: "GPT 3.5", premium: true, id: "gpt-3.5" },
+      { name: "GPT 3.5 Turbo", premium: true, id: "gpt-3.5-turbo" },
       { name: "GPT 4.1 Mini", premium: false, id: "gpt-4.1-mini" },
       { name: "GPT 4.1", premium: true, id: "gpt-4.1" },
-      { name: "GPT 5 Nano", premium: false, id: "gpt-5-nano" },
-      { name: "GPT 5 Mini", premium: false, id: "gpt-5-mini" },
+      { name: "GPT 5 Nano", premium: true, id: "gpt-5-nano" },
+      { name: "GPT 5 Mini", premium: true, id: "gpt-5-mini" },
       { name: "GPT 5", premium: true, id: "gpt-5" },
     ],
   },
@@ -21,14 +21,14 @@ export default [
     enable: true,
     subModel: [
       { name: "Gemini 2.5 Lite", premium: false, id: "gemini-2.5-flash-lite" },
-      { name: "Gemini 2.5 Flash", premium: false, id: "gemini-2.5-flash" },
+      { name: "Gemini 2.5 Flash", premium: true, id: "gemini-2.5-flash" },
       { name: "Gemini 2.5 Pro", premium: true, id: "Gemini 2.5 Pro" },
     ],
   },
   {
     model: "DeepSeek",
     icon: "/deepseek.png",
-    premium: true,
+    premium: false,
     enable: true,
     subModel: [
       { name: "DeepSeek R1", premium: false, id: "DeepSeek-R1" },

@@ -10,24 +10,33 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Lock, LockIcon, MessageSquare } from "lucide-react";
+import { Loader, Lock, LockIcon, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SelectGroup, SelectLabel } from "@radix-ui/react-select";
 import { AiSelectedModelContext } from "@/context/AiSelectedModelContext";
 import AIModelList from "@/shared/AIModelList";
 import { doc, updateDoc } from "firebase/firestore";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
 const AiMultiModel = () => {
   const [aiModeList, setAiModeList] = useState(AIModelList);
-  const { aiSelectedModels, setAiSelectedModels } = useContext(
-    AiSelectedModelContext,
-  );
+  const { aiSelectedModels, setAiSelectedModels, messages, setMessages } =
+    useContext(AiSelectedModelContext);
   const onToggleChange = (model, value) => {
     setAiModeList((prev) =>
       prev.map((m) => (m.model === model ? { ...m, enable: value } : m)),
     );
+    setAiSelectedModels((prev) => ({
+      ...prev,
+      [model]: {
+        ...(prev?.[model] ?? {}),
+        enable: value,
+      },
+    }));
   };
 
-  const onSelectedValue = async (parentModel, value) => {
+  const onSelectValue = async (parentModel, value) => {
     setAiSelectedModels((prev) => ({
       ...prev,
       [parentModel]: {
@@ -35,10 +44,7 @@ const AiMultiModel = () => {
       },
     }));
     //update to firebase db
-    const docRef = doc(db, "users", user?.primaryEmailAddress.emailAddress);
-    await updateDoc(docRef, {
-      selectedModelPref: aiSelectedModels,
-    });
+   
   };
   return (
     <div className="flex flex-1 h-[75vh] border-b">
@@ -62,15 +68,15 @@ const AiMultiModel = () => {
               />
               {model.enable && (
                 <Select
-                  defaultValue={aiSelectedModels[model.model].modelId}
-                  onValueCange={(value) => {
-                    onSelectedValue(model.model, value);
+                  defaultValue={aiSelectedModels[model.model]?.modelId}
+                  onValueChange={(value) => {
+                    onSelectValue(model.model, value);
                   }}
                   disabled={model.premium}
                 >
                   <SelectTrigger className="w-[180px]">
                     <SelectValue
-                      placeholder={aiSelectedModels[model.model].modelId}
+                      placeholder={aiSelectedModels[model.model]?.modelId}
                     />
                   </SelectTrigger>
                   <SelectContent>
@@ -99,7 +105,10 @@ const AiMultiModel = () => {
                               value={subModel.name}
                               disabled={subModel.premium}
                             >
-                              {subModel.name} {<LockIcon className="h-4 w-4" />}
+                              {subModel.name}{" "}
+                              {subModel.premium && (
+                                <LockIcon className="h-4 w-4" />
+                              )}
                             </SelectItem>
                           ),
                       )}
@@ -124,8 +133,39 @@ const AiMultiModel = () => {
           {model.premium && model.enable && (
             <div className="h-full flex items-center justify-center">
               <Button variant="outline">
-                <Lock /> Upgade to unlock
+                <Lock /> Upgrade to unlock
               </Button>
+            </div>
+          )}{" "}
+          {model.enable && (
+            <div className="flex">
+              <div className="flex-1 p-4 space-y-2">
+                {messages[model.model]?.map((m, i) => (
+                  <div
+                    key={i}
+                    className={`p-2 rounded-md ${m.role == "user" ? "bg-primary/10" : "bg-secondary"}`}
+                  >
+                    {m.role == "assistant" && (
+                      <span className="text-sm text-shadow-gray-300">
+                        {m.model ?? model.model}{" "}
+                      </span>
+                    )}
+                    <div className="flex gap-3 items-center">
+                      {m.content == "loading" && (
+                        <>
+                          <Loader className="animate-spin" />
+                          <span>Thinking...</span>
+                        </>
+                      )}
+                    </div>
+                    {m.content !== "loading" && (
+                      <Markdown remarkPlugins={[remarkGfm]}>
+                        {m.content}
+                      </Markdown>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
