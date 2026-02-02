@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 
 export async function POST(req) {
   const { model, msg, parentModel } = await req.json();
-  /* Send POST request using Axios */
   const response = await axios.post(
     "https://kravixstudio.com/api/v1/chat",
     {
@@ -14,7 +13,7 @@ export async function POST(req) {
     {
       headers: {
         "Content-Type": "application/json", // Tell server we're sending JSON
-        Authorization: "Bearer" + process.env.KRAVIX_STUDIO_API_KEY, // Replace with your API key
+        Authorization: "Bearer " + process.env.KRAVIX_STUDIO_API_KEY, // Replace with your API key
       },
     },
   );

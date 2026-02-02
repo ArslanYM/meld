@@ -6,7 +6,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "./_components/AppSidebar";
 import AppHeader from "./_components/AppHeader";
 import { useUser } from "@clerk/nextjs";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/config/FIrebaseConfig";
 import { AiSelectedModelContext } from "@/context/AiSelectedModelContext";
 import { DefaultModel } from "@/shared/AiModelsShared";
@@ -15,12 +15,28 @@ import { UserDetailContext } from "@/context/UserDetailContext";
 const Provider = ({ children, ...props }) => {
   const { user } = useUser();
   const [aiSelectedModels, setAiSelectedModels] = useState(DefaultModel);
+  const [messages, setMessages] = useState({});
   const [userDetail, setUserDetail] = useState();
   useEffect(() => {
     if (user) {
       CreateNewUser();
     }
   }, [user]);
+
+  useEffect(() => {
+    if (aiSelectedModels) {
+      updateAiSelectionPref();
+    }
+  }, [aiSelectedModels]);
+
+  const updateAiSelectionPref = async () => {
+    if (user) {
+      const docRef = doc(db, "users", user?.primaryEmailAddress.emailAddress);
+      await updateDoc(docRef, {
+        selectedModelPref: aiSelectedModels,
+      });
+    }
+  };
 
   const CreateNewUser = async () => {
     console.log("db call");
@@ -31,7 +47,7 @@ const Provider = ({ children, ...props }) => {
     if (userSnap.exists()) {
       console.log("user exists already");
       const userInfo = userSnap.data();
-      setAiSelectedModels(userInfo.selectedModelPref);
+      setAiSelectedModels(userInfo.selectedModelPref ?? DefaultModel);
       setUserDetail(userInfo);
       return;
     } else {
@@ -58,7 +74,12 @@ const Provider = ({ children, ...props }) => {
     >
       <UserDetailContext.Provider value={{ userDetail, setUserDetail }}>
         <AiSelectedModelContext.Provider
-          value={{ aiSelectedModels, setAiSelectedModels }}
+          value={{
+            aiSelectedModels,
+            setAiSelectedModels,
+            messages,
+            setMessages,
+          }}
         >
           <SidebarProvider>
             <AppSidebar />
