@@ -1,31 +1,58 @@
 import { NextResponse } from "next/server";
 import { aj } from "@/config/Arcjet";
 import { currentUser } from "@clerk/nextjs/server";
+
 export async function POST(request) {
-  const user = await currentUser();
-  const { token } = await request.json();
-  if (token) {
+  try {
+    const user = await currentUser();
+
+    // Check if user is authenticated
+    if (!user || !user.primaryEmailAddress?.emailAddress) {
+      return NextResponse.json(
+        { error: "User not authenticated" },
+        { status: 401 },
+      );
+    }
+
+    let body = {};
+    try {
+      body = await request.json();
+    } catch (err) {
+      console.error("Failed to parse request body:", err);
+      return NextResponse.json(
+        { error: "Invalid request body" },
+        { status: 400 },
+      );
+    }
+
+    const { token = 0 } = body;
+    const requestedTokens = token || 0;
+
+    // Call Arcjet to check rate limit
     const decision = await aj.protect(request, {
-      userId: user?.primaryEmailAddress?.emailAddress,
-      requested: token,
+      userId: user.primaryEmailAddress.emailAddress,
+      requested: requestedTokens,
     });
 
     if (decision.isDenied()) {
-      return NextResponse.json({
-        error: "Too many requests",
-        remainingToken: decision.reason.remaining,
-      });
+      return NextResponse.json(
+        {
+          error: "Rate limit exceeded",
+          remainingToken: decision.reason.remaining || 0,
+        },
+        { status: 429 },
+      );
     }
 
     return NextResponse.json({
       allowed: true,
-      remainingToken: decision.reason.remaining,
+      remainingToken: decision.reason.remaining || 0,
     });
-  } else {
-    const decision = await aj.protect(request, {
-      userId: user?.primaryEmailAddress?.emailAddress,
-      requested: 0,
-    });
-    return NextResponse.json({ remainingToken: decision.reason.remaining });
+  } catch (error) {
+    console.error("Error in user-remaining-msg route:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

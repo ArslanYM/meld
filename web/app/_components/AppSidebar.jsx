@@ -9,7 +9,7 @@ import {
 import Image from "next/image";
 import { ModeToggle } from "./ToggleTheme";
 import { Button } from "@/components/ui/button";
-import { SignIn, SignInButton, UserButton, useUser } from "@clerk/nextjs";
+import { SignIn, SignInButton, UserProfile, useUser } from "@clerk/nextjs";
 import { User2, UserIcon, Zap } from "lucide-react";
 import UsageCreditProgress from "./UsageCreditProgress";
 import { collection, query } from "firebase/firestore";
@@ -22,7 +22,7 @@ import Link from "next/link";
 import axios from "axios";
 import { AiSelectedModelContext } from "@/context/AiSelectedModelContext";
 import { useContext } from "react";
-
+import { UserButton } from "@clerk/nextjs";
 export function AppSidebar() {
   const { user } = useUser();
   const [chatHistory, setChatHistory] = useState([]);
@@ -65,8 +65,13 @@ export function AppSidebar() {
   };
 
   const GetRemainingTokenMessages = async () => {
-    const response = await axios.post("/api/user-remaining-msg");
-    setFreeMsgCount(response?.data?.remainingToken);
+    try {
+      const response = await axios.post("/api/user-remaining-msg", {});
+      setFreeMsgCount(response?.data?.remainingToken || 0);
+    } catch (error) {
+      console.error("Error fetching remaining messages:", error);
+      setFreeMsgCount(0);
+    }
   };
   return (
     <Sidebar>
@@ -141,8 +146,9 @@ export function AppSidebar() {
                 <Zap />
                 Upgrade Plan
               </Button>
+
               <Button className="flex w-full" variant="ghost">
-                <User2 /> Settings
+                <UserButton /> Profile
               </Button>
             </>
           ) : (
