@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { aj } from "@/config/Arcjet";
+import { aj } from "../../../config/Arcjet";
 import { currentUser } from "@clerk/nextjs/server";
 
 export async function POST(request) {
