@@ -1,15 +1,35 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Mic, Paperclip, Send } from "lucide-react";
-import React, { useContext, useEffect, useState } from "react";
+import React, { use, useContext, useEffect, useState } from "react";
 import AiMultiModel from "./AiMultiModel";
 import { AiSelectedModelContext } from "@/context/AiSelectedModelContext";
 import axios from "axios";
-
+import { v4 as uuidv4 } from "uuid";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { db } from "@/config/FirebaseConfig";
+import { useUser } from "@clerk/nextjs";
+import { useSearchParams } from "next/navigation";
 const ChatInputBox = () => {
-  const [userInput, setUserInput] = useState();
+  const [userInput, setUserInput] = useState("");
   const { aiSelectedModels, setAiSelectedModels, messages, setMessages } =
     useContext(AiSelectedModelContext);
+  const { user } = useUser();
+  const [chatId, setChatId] = useState(null);
+
+  const params = useSearchParams();
+
+  useEffect(() => {
+    const chatId_ = params.get("chatId");
+    if (chatId_) {
+      setChatId(chatId_);
+      GetMessages(chatId_);
+    }
+    {
+      setChatId(uuidv4());
+      setMessages([]);
+    }
+  }, [params]);
 
   const handleSend = async () => {
     if (!userInput.trim()) return;
@@ -99,9 +119,38 @@ const ChatInputBox = () => {
     );
   };
 
+  const GetMessages = async (chatId_) => {
+    const docRef = doc(db, "chatHistory", chatId_);
+    const docSnap = await getDoc(docRef);
+    console.log("Document data:", docSnap.data());
+    setMessages(docSnap.data().messages);
+  };
+
   useEffect(() => {
-    console.log(messages);
+    if (messages) {
+      SaveMessages();
+    }
   }, [messages]);
+
+  const SaveMessages = async () => {
+    if (!chatId) return;
+
+    // Check if there are any actual messages before saving
+    const hasMessages = Object.values(messages).some(
+      (modelMessages) =>
+        Array.isArray(modelMessages) && modelMessages.length > 0,
+    );
+
+    if (!hasMessages) return;
+
+    const docRef = doc(db, "chatHistory", chatId);
+    await setDoc(docRef, {
+      messages: messages,
+      chatId: chatId,
+      userEmail: user?.primaryEmailAddress?.emailAddress,
+      lastUpdated: Date.now(),
+    });
+  };
   return (
     <div className="relative max-h-screen">
       {/* Page Content */}
@@ -147,6 +196,3 @@ const ChatInputBox = () => {
 };
 
 export default ChatInputBox;
-
-// --- IGNORE ---
-// 2:40:59

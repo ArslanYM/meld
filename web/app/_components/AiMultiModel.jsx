@@ -44,7 +44,6 @@ const AiMultiModel = () => {
       },
     }));
     //update to firebase db
-   
   };
   return (
     <div className="flex flex-1 h-[75vh] border-b">
@@ -158,7 +157,7 @@ const AiMultiModel = () => {
                         </>
                       )}
                     </div>
-                    {m.content !== "loading" && (
+                    {m?.content !== "loading" && m?.content && (
                       <Markdown remarkPlugins={[remarkGfm]}>
                         {m.content}
                       </Markdown>
