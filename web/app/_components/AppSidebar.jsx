@@ -18,6 +18,7 @@ import { db } from "@/config/FirebaseConfig";
 import moment from "moment/moment";
 import { where } from "firebase/firestore";
 import { getDocs } from "firebase/firestore";
+import Link from "next/link";
 
 export function AppSidebar() {
   const { user } = useUser();
@@ -41,7 +42,7 @@ export function AppSidebar() {
   const GetUserLastMessage = (chat) => {
     const allMessages = Object.values(chat?.messages).flat();
     const userMessages = allMessages.filter((msg) => msg.role === "user");
-    const lastUserMsg = userMessages[userMessages.length - 1].content || null;
+    const lastUserMsg = userMessages.length > 0 ? userMessages[userMessages.length - 1].content : null;
     const lastUpdated = chat?.lastUpdated || null;
     const formattedDate = moment(lastUpdated).fromNow();
     return {
@@ -71,9 +72,11 @@ export function AppSidebar() {
             </div>
           </div>
           {user ? (
-            <Button variant="outline" className="mt-7 w-full" size="lg">
-              + New Chat
-            </Button>
+            <Link href={"/"}>
+              <Button variant="outline" className="mt-7 w-full" size="lg">
+                + New Chat
+              </Button>
+            </Link>
           ) : (
             <SignInButton>
               <Button variant="outline" className="mt-7 w-full" size="lg">
@@ -93,7 +96,7 @@ export function AppSidebar() {
               </p>
             )}
             {chatHistory.map((chat, index) => (
-              <div key={index} className="">
+              <Link key={index} className="" href={"?chatId=" + chat.chatId}>
                 <div className="p-3  cursor-pointer hover:bg-primary/5 ">
                   {" "}
                   <h2
@@ -107,7 +110,7 @@ export function AppSidebar() {
                   </h2>
                 </div>
                 <hr className="my-1 " />
-              </div>
+              </Link>
             ))}
           </div>
         </SidebarGroup>
