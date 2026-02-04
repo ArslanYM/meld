@@ -11,6 +11,7 @@ import { db } from "@/config/FirebaseConfig";
 import { AiSelectedModelContext } from "@/context/AiSelectedModelContext";
 import { DefaultModel } from "@/shared/AiModelsShared";
 import { UserDetailContext } from "@/context/UserDetailContext";
+import { Toaster } from "@/components/ui/sonner";
 
 const Provider = ({ children, ...props }) => {
   const { user } = useUser();
@@ -91,6 +92,7 @@ const Provider = ({ children, ...props }) => {
           </SidebarProvider>
         </AiSelectedModelContext.Provider>
       </UserDetailContext.Provider>
+      <Toaster position="top-center" />
     </NextThemeProvider>
   );
 };
