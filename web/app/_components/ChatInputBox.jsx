@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Mic, Paperclip, Send } from "lucide-react";
-import React, { use, useContext, useEffect, useState } from "react";
+import React, { use, useContext, useEffect, useState, Suspense } from "react";
 import AiMultiModel from "./AiMultiModel";
 import { AiSelectedModelContext } from "@/context/AiSelectedModelContext";
 import axios from "axios";
@@ -11,7 +11,8 @@ import { db } from "../../config/FirebaseConfig";
 import { useUser } from "@clerk/nextjs";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-const ChatInputBox = () => {
+
+const ChatInputBoxContent = () => {
   const [userInput, setUserInput] = useState("");
   const { aiSelectedModels, setAiSelectedModels, messages, setMessages } =
     useContext(AiSelectedModelContext);
@@ -25,8 +26,7 @@ const ChatInputBox = () => {
     if (chatId_) {
       setChatId(chatId_);
       GetMessages(chatId_);
-    }
-    {
+    } else {
       setChatId(uuidv4());
       setMessages([]);
     }
@@ -216,5 +216,11 @@ const ChatInputBox = () => {
     </div>
   );
 };
+
+const ChatInputBox = () => (
+  <Suspense fallback={<div>Loading...</div>}>
+    <ChatInputBoxContent />
+  </Suspense>
+);
 
 export default ChatInputBox;
