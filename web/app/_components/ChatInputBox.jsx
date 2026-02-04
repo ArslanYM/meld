@@ -7,7 +7,7 @@ import { AiSelectedModelContext } from "@/context/AiSelectedModelContext";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { db } from "../../config/FirebaseConfig";
+import { db } from "@/config/FirebaseConfig.js";
 import { useUser } from "@clerk/nextjs";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
