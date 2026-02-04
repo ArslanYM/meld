@@ -12,9 +12,44 @@ import { Button } from "@/components/ui/button";
 import { SignIn, SignInButton, UserButton, useUser } from "@clerk/nextjs";
 import { User2, UserIcon, Zap } from "lucide-react";
 import UsageCreditProgress from "./UsageCreditProgress";
+import { collection, query } from "firebase/firestore";
+import { useEffect, useState } from "react";
+import { db } from "@/config/FirebaseConfig";
+import moment from "moment/moment";
+import { where } from "firebase/firestore";
+import { getDocs } from "firebase/firestore";
 
 export function AppSidebar() {
   const { user } = useUser();
+  const [chatHistory, setChatHistory] = useState([]);
+
+  useEffect(() => {
+    user && GetChatHistory();
+  }, [user]);
+
+  const GetChatHistory = async () => {
+    const q = query(
+      collection(db, "chatHistory"),
+      where("userEmail", "==", user?.primaryEmailAddress?.emailAddress),
+    );
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      setChatHistory((prev) => [...prev, doc.data()]);
+    });
+  };
+
+  const GetUserLastMessage = (chat) => {
+    const allMessages = Object.values(chat?.messages).flat();
+    const userMessages = allMessages.filter((msg) => msg.role === "user");
+    const lastUserMsg = userMessages[userMessages.length - 1].content || null;
+    const lastUpdated = chat?.lastUpdated || null;
+    const formattedDate = moment(lastUpdated).fromNow();
+    return {
+      chatId: chat.chatId,
+      message: lastUserMsg,
+      lastUpdated: formattedDate,
+    };
+  };
   return (
     <Sidebar>
       <SidebarHeader>
@@ -52,13 +87,28 @@ export function AppSidebar() {
         <SidebarGroup>
           <div className={"p-3"}>
             <h2 className="font-bold text-lg">Chat</h2>
-            {user ? (
-              <></>
-            ) : (
+            {!user && (
               <p className="text-sm ">
                 Sign in to start chating with multiple AI models.
               </p>
             )}
+            {chatHistory.map((chat, index) => (
+              <div key={index} className="">
+                <div className="p-3  cursor-pointer hover:bg-primary/5 ">
+                  {" "}
+                  <h2
+                    className=" text-sm text-primary/20
+                  "
+                  >
+                    {GetUserLastMessage(chat).lastUpdated}
+                  </h2>
+                  <h2 className=" text-lg text-primary line-clamp-1">
+                    {GetUserLastMessage(chat).message}
+                  </h2>
+                </div>
+                <hr className="my-1 " />
+              </div>
+            ))}
           </div>
         </SidebarGroup>
       </SidebarContent>
