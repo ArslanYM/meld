@@ -19,14 +19,23 @@ import moment from "moment/moment";
 import { where } from "firebase/firestore";
 import { getDocs } from "firebase/firestore";
 import Link from "next/link";
+import axios from "axios";
+import { AiSelectedModelContext } from "@/context/AiSelectedModelContext";
+import { useContext } from "react";
 
 export function AppSidebar() {
   const { user } = useUser();
   const [chatHistory, setChatHistory] = useState([]);
-
+  const [freeMsgCount, setFreeMsgCount] = useState(0);
+  const { aiSelectedModels, setAiSelectedModels, messages, setMessages } =
+    useContext(AiSelectedModelContext);
   useEffect(() => {
     user && GetChatHistory();
   }, [user]);
+
+  useEffect(() => {
+    user && GetRemainingTokenMessages();
+  }, [messages]);
 
   const GetChatHistory = async () => {
     const q = query(
@@ -42,7 +51,10 @@ export function AppSidebar() {
   const GetUserLastMessage = (chat) => {
     const allMessages = Object.values(chat?.messages).flat();
     const userMessages = allMessages.filter((msg) => msg.role === "user");
-    const lastUserMsg = userMessages.length > 0 ? userMessages[userMessages.length - 1].content : null;
+    const lastUserMsg =
+      userMessages.length > 0
+        ? userMessages[userMessages.length - 1].content
+        : null;
     const lastUpdated = chat?.lastUpdated || null;
     const formattedDate = moment(lastUpdated).fromNow();
     return {
@@ -50,6 +62,11 @@ export function AppSidebar() {
       message: lastUserMsg,
       lastUpdated: formattedDate,
     };
+  };
+
+  const GetRemainingTokenMessages = async () => {
+    const response = await axios.post("/api/user-remaining-msg");
+    setFreeMsgCount(response?.data?.remainingToken);
   };
   return (
     <Sidebar>
@@ -119,7 +136,7 @@ export function AppSidebar() {
         <div className="p-3 mb-10">
           {user ? (
             <>
-              <UsageCreditProgress />
+              <UsageCreditProgress remainingToken={freeMsgCount} />
               <Button className={"w-full mb-3"} variant="outline">
                 <Zap />
                 Upgrade Plan
