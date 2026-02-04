@@ -35,15 +35,21 @@ const ChatInputBox = () => {
   const handleSend = async () => {
     if (!userInput.trim()) return;
 
-    const response = await axios.post("/api/user-remaining-msg", {
-      token: 1,
-    });
-    const remainingToken = response?.data?.remainingToken;
+    try {
+      const response = await axios.post("/api/user-remaining-msg", {
+        token: 1,
+      });
+      const remainingToken = response?.data?.remainingToken;
 
-    if (remainingToken <= 0) {
-      toast.error(
-        "You have exhausted your free message quota. Please upgrade your plan to continue using the service.",
-      );
+      if (remainingToken <= 0) {
+        toast.error(
+          "You have exhausted your free message quota. Please upgrade your plan to continue using the service.",
+        );
+        return;
+      }
+    } catch (error) {
+      console.error("Error checking remaining messages:", error);
+      toast.error("Failed to check message quota. Please try again.");
       return;
     }
 
