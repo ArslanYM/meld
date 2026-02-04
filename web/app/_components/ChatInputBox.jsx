@@ -10,6 +10,7 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "@/config/FirebaseConfig";
 import { useUser } from "@clerk/nextjs";
 import { useSearchParams } from "next/navigation";
+import { toast } from "sonner";
 const ChatInputBox = () => {
   const [userInput, setUserInput] = useState("");
   const { aiSelectedModels, setAiSelectedModels, messages, setMessages } =
@@ -33,6 +34,18 @@ const ChatInputBox = () => {
 
   const handleSend = async () => {
     if (!userInput.trim()) return;
+
+    const response = await axios.post("/api/user-remaining-msg", {
+      token: 1,
+    });
+    const remainingToken = response?.data?.remainingToken;
+
+    if (remainingToken <= 0) {
+      toast.error(
+        "You have exhausted your free message quota. Please upgrade your plan to continue using the service.",
+      );
+      return;
+    }
 
     // 1️⃣ Add user message to all enabled models
     setMessages((prev) => {
@@ -123,7 +136,10 @@ const ChatInputBox = () => {
     const docRef = doc(db, "chatHistory", chatId_);
     const docSnap = await getDoc(docRef);
     console.log("Document data:", docSnap.data());
-    setMessages(docSnap.data().messages);
+    if (docSnap.exists()) {
+      setMessages(docSnap.data().messages);
+    }
+    return;
   };
 
   useEffect(() => {
