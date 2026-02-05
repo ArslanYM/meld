@@ -7,7 +7,7 @@ import { AiSelectedModelContext } from "@/context/AiSelectedModelContext";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { db } from "@/config/FirebaseConfig.js";
+import { db } from "@/config/FirebaseConfig";
 import { useUser } from "@clerk/nextjs";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
@@ -100,7 +100,7 @@ const ChatInputBoxContent = () => {
 
           const { aiResponse, model } = result.data;
 
-          // 3️⃣ Add AI response to that model’s messages
+          // 3️⃣ Add AI response to that model's messages
           setMessages((prev) => {
             const updated = [...(prev[parentModel] ?? [])];
             const loadingIndex = updated.findIndex((m) => m.loading);

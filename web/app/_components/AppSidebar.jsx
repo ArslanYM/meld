@@ -14,7 +14,7 @@ import { User2, UserIcon, Zap } from "lucide-react";
 import UsageCreditProgress from "./UsageCreditProgress";
 import { collection, query } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { db } from "@/config/FirebaseConfig.js";
+import { db } from "@/config/FirebaseConfig";
 import moment from "moment/moment";
 import { where } from "firebase/firestore";
 import { getDocs } from "firebase/firestore";
@@ -23,6 +23,7 @@ import axios from "axios";
 import { AiSelectedModelContext } from "@/context/AiSelectedModelContext";
 import { useContext } from "react";
 import { UserButton } from "@clerk/nextjs";
+
 export function AppSidebar() {
   const { user } = useUser();
   const [chatHistory, setChatHistory] = useState([]);
