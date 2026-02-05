@@ -7,7 +7,7 @@ import { AppSidebar } from "./_components/AppSidebar";
 import AppHeader from "./_components/AppHeader";
 import { useUser } from "@clerk/nextjs";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
-import { db } from "@/config/FirebaseConfig.js";
+import { db } from "@/config/FirebaseConfig";
 import { AiSelectedModelContext } from "@/context/AiSelectedModelContext";
 import { DefaultModel } from "@/shared/AiModelsShared";
 import { UserDetailContext } from "@/context/UserDetailContext";
