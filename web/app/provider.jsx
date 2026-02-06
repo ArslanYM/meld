@@ -58,7 +58,7 @@ const Provider = ({ children, ...props }) => {
         createdAt: new Date(),
         remainingMsg: 5,
         plan: "Free",
-        credits: 1000,
+        credits: 1000,   // TODO: fix this as per plan
       };
       await setDoc(userRef, userData);
       console.log("created user");
