@@ -14,7 +14,7 @@ import { User2, UserIcon, Zap } from "lucide-react";
 import UsageCreditProgress from "./UsageCreditProgress";
 import { collection, query } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { db } from "@/config/FirebaseConfig";
+import { db } from "@/config/firebase";
 import moment from "moment/moment";
 import { where } from "firebase/firestore";
 import { getDocs } from "firebase/firestore";
